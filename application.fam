@@ -12,7 +12,7 @@ App(
     fap_icon="lifecounter.png",  # 10x10 1-bit PNG
     fap_description="Application to record life situation of a collectible card game",
     fap_author="Antsy",
-    # fap_weburl="https://github.com/user/lifecounter",
+    fap_weburl="https://github.com/antsy/Lifecounter",
     fap_icon_assets="images",  # Image assets to compile for this application
     requires=[
         "gui",
