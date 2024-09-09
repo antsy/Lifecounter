@@ -73,7 +73,7 @@ typedef struct {
  * @param      _context  The context - unused
  * @return     next view id
 */
-static uint32_t lifecounter_navigation_exit_callback(void* _context) {
+static uint32_t navigation_exit_callback(void* _context) {
     UNUSED(_context);
     return VIEW_NONE;
 }
@@ -81,12 +81,12 @@ static uint32_t lifecounter_navigation_exit_callback(void* _context) {
 /**
  * Callback for returning to submenu.
 */
-static uint32_t lifecounter_navigation_submenu_callback(void* _context) {
+static uint32_t navigation_submenu_callback(void* _context) {
     UNUSED(_context);
     return LifecounterViewSubmenu;
 }
 
-static uint32_t lifecounter_navigation_main_callback(void* _context) {
+static uint32_t navigation_main_callback(void* _context) {
     UNUSED(_context);
     return LifecounterViewMain;
 }
@@ -231,7 +231,7 @@ LifecounterModel* read_config(LifecounterModel* model) {
  * @param      context   The context - LifecounterApp object.
  * @param      index     The LifecounterSubmenuIndex item that was clicked.
 */
-static void lifecounter_submenu_callback(void* context, uint32_t index) {
+static void submenu_callback(void* context, uint32_t index) {
     LifecounterApp* app = (LifecounterApp*)context;
     switch(index) {
     case LifecounterSubmenuIndexConfigure:
@@ -255,7 +255,7 @@ static void lifecounter_submenu_callback(void* context, uint32_t index) {
 /**
  * Callback for changing the default life value.
  */
-static void lifecounter_default_life_change(VariableItem* item) {
+static void default_life_change(VariableItem* item) {
     LifecounterApp* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, default_life_names[index]);
@@ -266,7 +266,7 @@ static void lifecounter_default_life_change(VariableItem* item) {
 /**
  * Callback for changing the backlight setting.
  */
-static void lifecounter_backlight_change(VariableItem* item) {
+static void backlight_change(VariableItem* item) {
     LifecounterApp* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, toggle_states_names[index]);
@@ -284,7 +284,7 @@ static void lifecounter_backlight_change(VariableItem* item) {
 /**
  * Callback for changing the audio setting.
  */
-static void lifecounter_audio_change(VariableItem* item) {
+static void audio_change(VariableItem* item) {
     LifecounterApp* app = variable_item_get_context(item);
     uint8_t index = variable_item_get_current_value_index(item);
     variable_item_set_current_value_text(item, toggle_states_names[index]);
@@ -295,7 +295,7 @@ static void lifecounter_audio_change(VariableItem* item) {
 /**
  * Dummy callback for the save button (its value doesn't change).
  */
-static void valie_change_callback_dummy(VariableItem *item) {
+static void value_change_callback_dummy(VariableItem *item) {
     UNUSED(item);
 }
 
@@ -305,7 +305,7 @@ static void valie_change_callback_dummy(VariableItem *item) {
  * @param      context  The context - LifecounterApp object.
  * @param      index - The index of the item that was clicked.
 */
-static void lifecounter_setting_item_clicked(void* context, uint32_t index) {
+static void setting_item_clicked(void* context, uint32_t index) {
     LifecounterApp* app = (LifecounterApp*)context;
     LifecounterModel* model = view_get_model(app->view_main);
 
@@ -329,9 +329,9 @@ static void lifecounter_setting_item_clicked(void* context, uint32_t index) {
  * @param      canvas  The canvas to draw on.
  * @param      model   The model - MyModel object.
 */
-static void lifecounter_view_main_draw_callback(Canvas* canvas, void* model) {
+static void view_main_draw_callback(Canvas* canvas, void* model) {
     LifecounterModel* my_model = (LifecounterModel*)model;
-    FURI_LOG_T(TAG, "lifecounter_view_main_draw_callback");
+    FURI_LOG_T(TAG, "view_main_draw_callback");
     canvas_set_font(canvas, FontPrimary);
     //canvas_draw_str_aligned(canvas, 7, 6, AlignLeft, AlignTop, "Player 1");
 
@@ -366,7 +366,7 @@ static void lifecounter_view_main_draw_callback(Canvas* canvas, void* model) {
 /**
  * Draw the splash screen.
  */
-static void lifecounter_view_splash_draw_callback(Canvas* canvas, void* model) {
+static void view_splash_draw_callback(Canvas* canvas, void* model) {
     UNUSED(model);
     canvas_draw_icon(canvas, 0, 0, &I_Splash_128x64);
 }
@@ -377,7 +377,7 @@ static void lifecounter_view_splash_draw_callback(Canvas* canvas, void* model) {
  * @details    This function is called when the timer is elapsed.  We use this to queue a redraw event.
  * @param      context  The context - LifecounterApp object.
 */
-static void lifecounter_view_main_timer_callback(void* context) {
+static void view_main_timer_callback(void* context) {
     LifecounterApp* app = (LifecounterApp*)context;
     view_dispatcher_send_custom_event(app->view_dispatcher, LifecounterEventIdRedrawScreen);
 }
@@ -387,11 +387,11 @@ static void lifecounter_view_main_timer_callback(void* context) {
  *
  * @param      context  The context - LifecounterApp object.
 */
-static void lifecounter_view_main_enter_callback(void* context) {
+static void view_main_enter_callback(void* context) {
     uint32_t period = furi_ms_to_ticks(200);
     LifecounterApp* app = (LifecounterApp*)context;
     furi_assert(app->timer == NULL);
-    app->timer = furi_timer_alloc(lifecounter_view_main_timer_callback, FuriTimerTypePeriodic, context);
+    app->timer = furi_timer_alloc(view_main_timer_callback, FuriTimerTypePeriodic, context);
     furi_timer_start(app->timer, period);
 }
 
@@ -400,7 +400,7 @@ static void lifecounter_view_main_enter_callback(void* context) {
  *
  * @param      context  The context - LifecounterApp object.
 */
-static void lifecounter_view_main_exit_callback(void* context) {
+static void view_main_exit_callback(void* context) {
     LifecounterApp* app = (LifecounterApp*)context;
     furi_timer_stop(app->timer);
     furi_timer_free(app->timer);
@@ -414,7 +414,7 @@ static void lifecounter_view_main_exit_callback(void* context) {
  * @param      event    The event id - LifecounterEventId value.
  * @param      context  The context - LifecounterApp object.
 */
-static bool lifecounter_view_main_custom_event_callback(uint32_t event, void* context) {
+static bool view_main_custom_event_callback(uint32_t event, void* context) {
     LifecounterApp* app = (LifecounterApp*)context;
     switch(event) {
     case LifecounterEventIdRedrawScreen:
@@ -433,7 +433,7 @@ static bool lifecounter_view_main_custom_event_callback(uint32_t event, void* co
 /**
  * Callback for splash screen input (in order to exit it).
  */
-static bool lifecounter_view_splash_input_callback(InputEvent* event, void* context) {
+static bool view_splash_input_callback(InputEvent* event, void* context) {
     LifecounterApp* app = (LifecounterApp*)context;
 
     if(event->type == InputTypePress) {
@@ -454,11 +454,11 @@ static bool lifecounter_view_splash_input_callback(InputEvent* event, void* cont
  * @param      context  The context - LifecounterApp object.
  * @return     true if the event was handled, false otherwise.
 */
-static bool lifecounter_view_main_input_callback(InputEvent* event, void* context) {
+static bool view_main_input_callback(InputEvent* event, void* context) {
     LifecounterApp* app = (LifecounterApp*)context;
     LifecounterModel* my_model = view_get_model(app->view_main);
 
-    FURI_LOG_T(TAG, "lifecounter_view_main_input_callback");
+    FURI_LOG_T(TAG, "view_main_input_callback");
 
     if(event->type == InputTypeShort) {
         if(event->key == InputKeyUp) {
@@ -514,7 +514,7 @@ int find_index( const int a[], int size, int value )
 /**
 * Setup and allocate the application resources
 */
-static LifecounterApp* lifecounter_app_alloc() {
+static LifecounterApp* app_alloc() {
     LifecounterApp* app = (LifecounterApp*)malloc(sizeof(LifecounterApp));
 
     Gui* gui = furi_record_open(RECORD_GUI);
@@ -530,13 +530,13 @@ static LifecounterApp* lifecounter_app_alloc() {
 
     FURI_LOG_T(TAG, "allocate menu");
     app->submenu = submenu_alloc();
-    submenu_add_item(app->submenu, "Return to life view", LifecounterSubmenuIndexMain, lifecounter_submenu_callback, app);
+    submenu_add_item(app->submenu, "Return to life view", LifecounterSubmenuIndexMain, submenu_callback, app);
 
-    submenu_add_item(app->submenu, "Reset lifes", LifecounterSubmenuIndexReset, lifecounter_submenu_callback, app);
+    submenu_add_item(app->submenu, "Reset lifes", LifecounterSubmenuIndexReset, submenu_callback, app);
 
-    submenu_add_item(app->submenu, "Configure settings", LifecounterSubmenuIndexConfigure, lifecounter_submenu_callback, app);
+    submenu_add_item(app->submenu, "Configure settings", LifecounterSubmenuIndexConfigure, submenu_callback, app);
 
-    view_set_previous_callback(submenu_get_view(app->submenu), lifecounter_navigation_exit_callback);
+    view_set_previous_callback(submenu_get_view(app->submenu), navigation_exit_callback);
 
     view_dispatcher_add_view(app->view_dispatcher, LifecounterViewSubmenu, submenu_get_view(app->submenu));
 
@@ -546,7 +546,7 @@ static LifecounterApp* lifecounter_app_alloc() {
         app->variable_item_list_settings,
         "Starting life",
         COUNT_OF(default_life_values),
-        lifecounter_default_life_change,
+        default_life_change,
         app);
 
     uint8_t default_life_index = find_index(default_life_values, sizeof(default_life_values), settings->default_life);
@@ -557,7 +557,7 @@ static LifecounterApp* lifecounter_app_alloc() {
         app->variable_item_list_settings,
         "Backlight",
         COUNT_OF(toggle_state_values),
-        lifecounter_backlight_change,
+        backlight_change,
         app);
 
     uint8_t backlight_index = find_index(toggle_state_values, sizeof(toggle_state_values), settings->backlight_on);
@@ -568,7 +568,7 @@ static LifecounterApp* lifecounter_app_alloc() {
         app->variable_item_list_settings,
         "Audio feedback",
         COUNT_OF(toggle_state_values),
-        lifecounter_audio_change,
+        audio_change,
         app);
 
     uint8_t audio_state_index = find_index(toggle_state_values, sizeof(toggle_state_values), settings->sound_on);
@@ -579,22 +579,22 @@ static LifecounterApp* lifecounter_app_alloc() {
         app->variable_item_list_settings,
         "Save settings",
         0,
-        valie_change_callback_dummy,
+        value_change_callback_dummy,
         app);
 
-    variable_item_list_set_enter_callback(app->variable_item_list_settings, lifecounter_setting_item_clicked, app);
-    view_set_previous_callback(variable_item_list_get_view(app->variable_item_list_settings), lifecounter_navigation_submenu_callback);
+    variable_item_list_set_enter_callback(app->variable_item_list_settings, setting_item_clicked, app);
+    view_set_previous_callback(variable_item_list_get_view(app->variable_item_list_settings), navigation_submenu_callback);
     view_dispatcher_add_view(app->view_dispatcher, LifecounterViewConfigure, variable_item_list_get_view(app->variable_item_list_settings));
 
     FURI_LOG_T(TAG, "allocate main view");
     app->view_main = view_alloc();
-    view_set_draw_callback(app->view_main, lifecounter_view_main_draw_callback);
-    view_set_input_callback(app->view_main, lifecounter_view_main_input_callback);
-    view_set_previous_callback(app->view_main, lifecounter_navigation_submenu_callback);
-    view_set_enter_callback(app->view_main, lifecounter_view_main_enter_callback);
-    view_set_exit_callback(app->view_main, lifecounter_view_main_exit_callback);
+    view_set_draw_callback(app->view_main, view_main_draw_callback);
+    view_set_input_callback(app->view_main, view_main_input_callback);
+    view_set_previous_callback(app->view_main, navigation_submenu_callback);
+    view_set_enter_callback(app->view_main, view_main_enter_callback);
+    view_set_exit_callback(app->view_main, view_main_exit_callback);
     view_set_context(app->view_main, app);
-    view_set_custom_callback(app->view_main, lifecounter_view_main_custom_event_callback);
+    view_set_custom_callback(app->view_main, view_main_custom_event_callback);
 
     view_allocate_model(app->view_main, ViewModelTypeLockFree, sizeof(LifecounterModel));
     LifecounterModel* model = view_get_model(app->view_main);
@@ -608,9 +608,9 @@ static LifecounterApp* lifecounter_app_alloc() {
 
     FURI_LOG_T(TAG, "allocate splash screen");
     app->splash_screen = view_alloc();
-    view_set_draw_callback(app->splash_screen, lifecounter_view_splash_draw_callback);
-    view_set_input_callback(app->splash_screen, lifecounter_view_splash_input_callback);
-    view_set_previous_callback(app->splash_screen, lifecounter_navigation_main_callback);
+    view_set_draw_callback(app->splash_screen, view_splash_draw_callback);
+    view_set_input_callback(app->splash_screen, view_splash_input_callback);
+    view_set_previous_callback(app->splash_screen, navigation_main_callback);
     view_set_context(app->splash_screen, app);
     view_dispatcher_add_view(app->view_dispatcher, LifecounterViewSplash, app->splash_screen);
 
@@ -662,7 +662,7 @@ static void lifecounter_free(LifecounterApp* app) {
 int32_t lifecounter_app(void* params) {
     UNUSED(params);
 
-    LifecounterApp* app = lifecounter_app_alloc();
+    LifecounterApp* app = app_alloc();
     view_dispatcher_run(app->view_dispatcher);
 
     lifecounter_free(app);
